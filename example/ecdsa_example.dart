@@ -1,27 +1,24 @@
+import 'dart:typed_data';
+
 import 'package:elliptic/elliptic.dart';
 import 'package:schnorr/schnorr.dart';
 
 void main() {
-  var ec = getS256();
-  var priv = ec.generatePrivateKey();
+  var ec = getSecp256k1();
+  var privateKey = '38dab9461e04359a85787e0f6fa6cfc620c865dd26c4bb1e70b06bb1a91f5a8c';
+  var messageHex ='6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b';
+
+  var priv = PrivateKey.fromHex(ec, privateKey);
+
   var pub = priv.publicKey;
-  print(priv);
-  print(pub);
-  var hashHex =
-      'b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9';
-  var hash = List<int>.generate(hashHex.length ~/ 2,
-      (i) => int.parse(hashHex.substring(i * 2, i * 2 + 2), radix: 16));
 
-  var sig = deterministicSign(priv, hash);
-  var result = verify(pub, hash, sig);
 
-  assert(result);
+  var hash = List<int>.generate(messageHex.length ~/ 2,
+      (i) => int.parse(messageHex.substring(i * 2, i * 2 + 2), radix: 16));
 
-  var priv2 = ec.generatePrivateKey();
-  var pub2 = priv.publicKey;
+  var signature = deterministicSignHex(priv, hash);
 
-  var sig2 = aggregateSign([priv, priv2], hash);
-  var result2 = verify(combinePublicKeys([pub, pub2]), hash, sig2);
-
-  assert(result2);
+  print("------------------------------------");
+  print(signature);
+  print("------------------------------------");
 }
